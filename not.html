@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<title>My page</title>
+	<link rel="shortcut icon" href="https://cdn0.iconfinder.com/data/icons/citycons/150/Citycons_ship-512.png">
+	<style>
+		body {
+			background: url("http://wallpapercave.com/wp/GFJKN1J.jpg");
+			background-repeat: no-repeat;
+			background-size: cover;
+		}
+	</style>
+</head>
+<font size="6" color="blue" face="Freestyle script">
+<h1 align="center">My Page</h1></font>
+ <button style="color: blue; background-color: white; border-radius: 20px;" id="show">Show all users</button>
+<p>Please fill in the fields for add or update data</p>
+<form method="POST" action="/">
+    Email: 		<input id="email" type="text" name="email"><br>
+	First name: <input id="fname" type="text" name="fname"><br>
+	Last name: 	<input id="lname" type="text" name="lname"><br>
+                <button style="color: blue; background-color: white; border-radius: 20px;" id = "add">ADD</button>  			
+</form>
+<button style="color: blue; background-color: white; border-radius: 20px;" id="update">UPDATE</button>
+    Id:			<input id="id"    type="number" name="id"><br> 
+<p>Please fill in the field for delete or get data</p>
+<form method="GET" action="/">
+    Id: <input type="number" id="findById"></form>
+<button style="color: blue; background-color: white; border-radius: 20px;" id="get">GET</button>  		
+<form method="DELETE" action="/"></form>
+<button style="color: blue; background-color: white; border-radius: 20px;" id="delete">DELETE</button>
+
+<ol></ol>
+
+   		<script>
+		$(document).ready(function(){
+			$('#add').click(function(){
+				$.ajax({
+					url			: 'users',
+					method      : 'POST',
+        			data        : JSON.stringify({ firstName   : $('#fname').val(), 
+        							lastName:$('#lname').val(), 
+        							email:$('#email').val()}),
+					success     : function(data) {
+									const obj = JSON.parse(data);
+									alert("Your id is: " + obj._id);
+								},
+        			error       : function(data) {
+            						alert('Error adding data');
+        						}
+        		});
+			});
+			$('#get').click(function(){
+			const value = $('#findById').val();
+			
+			$.ajax({
+				url         : '/users/' + value,
+				method	    : 'GET',
+				success		: function(data){
+								const my = JSON.parse(data);
+								$('#findById').val(my._id);
+								$('#fname').val(my.firstName);
+								$('#lname').val(my.lastName);
+								$('#email').val(my.email);
+							},
+				error       : function(data){
+								alert('Error geting data');
+							}
+				});
+			});
+			$('#delete').click(function(){
+				const it = $('#findById').val();
+				$.ajax({
+					url		: '/users/' + it,
+					method  : 'DELETE',
+					success : function(data){
+							  alert("deleted");
+					},
+					error   : function(){
+						      alert('Error deleting data');
+					}
+				});
+			});
+			$('#update').click(function(){
+				$.ajax({
+					url    : 'users',
+					method : 'PUT',
+					data   : JSON.stringify({ firstName : $('#fname').val(), 
+        						lastName :$('#lname').val(), 
+        						email :$('#email').val(),
+        						_id:$('#id').val()}),
+					success     : function(data) {
+									alert("updated");
+								},
+        			error       : function(data) {
+            						alert('Error updating data');
+        						}
+				});
+			});
+			$('#show').click(function(){
+				$.ajax({
+					url    : 'users',
+					method   : 'GET',
+					success     : function(data) {
+									const res = JSON.parse(data);
+									const keys = Object.keys(res);
+									$("ol").empty();
+									keys.forEach(function(arg){
+										$("ol").append($("<li>First name: "+ res[arg].firstName + "<br>" +
+											"  Last name: " + res[arg].lastName + "<br>" + "  Email: " +
+											res[arg].email + "</li>"));
+									});
+								},
+									
+        			error       : function(data) {
+            						alert('Error nothing to show');
+        						}
+				});
+			});
+		});
+	</script>
+</body>
+</html>
